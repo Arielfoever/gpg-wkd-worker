@@ -1,0 +1,36 @@
+name: Deploy to EdgeOne Pages
+
+# 说明：
+#   - 本工作流会把纯静态 WKD 站点部署到腾讯云 EdgeOne Pages。
+#   - 与 Cloudflare 的 `Deploy Worker` 工作流相互独立，两个都会在 push 到 main 时触发。
+#   - 若只想保留其中一个平台，删除不需要的 workflow 文件即可。
+#   - 需要的 Repository Secret：EDGEONE_API_TOKEN
+#   - 可选的 Repository Variable：EDGEONE_PROJECT_NAME（默认 gpg-wkd-worker）
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.11.0'
+
+      - name: Build static WKD site
+        # 需要 Direct 模式（直接绑定邮箱域名本身）时，取消下一行注释并设置域名。
+        # env:
+        #   WKD_DIRECT_DOMAIN: example.com
+        run: node tools/build-edgeone.mjs
+
+      - name: Deploy to EdgeOne Pages
+        run: npx --yes edgeone pages deploy ./dist -n ${{ vars.EDGEONE_PROJECT_NAME || 'gpg-wkd-worker' }} -t ${{ secrets.EDGEONE_API_TOKEN }}

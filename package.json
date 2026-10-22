@@ -6,7 +6,10 @@
 		"deploy": "wrangler deploy",
 		"dev": "wrangler dev",
 		"start": "wrangler dev",
-		"cf-typegen": "wrangler types"
+		"cf-typegen": "wrangler types",
+		"manifest": "node tools/generate-wkd-manifest.mjs",
+		"build:edgeone": "node tools/build-edgeone.mjs",
+		"dev:edgeone": "npx edgeone pages dev"
 	},
 	"devDependencies": {
 		"typescript": "^5.5.2",
